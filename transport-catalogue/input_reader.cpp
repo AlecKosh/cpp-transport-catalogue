@@ -124,7 +124,7 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) 
             Stop stop;
             stop.name = com.id;
             stop.coordinates = parse::ParseCoordinates(com.description);
-            catalogue.AddStop(stop);
+            catalogue.AddStop(std::move(stop));
         }
     }
     for (const CommandDescription& com: commands_) {
@@ -136,7 +136,7 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) 
                 stops.push_back(catalogue.GetStop(stop_name));
             }
             bus.stops = stops;
-            catalogue.AddBus(bus);
+            catalogue.AddBus(std::move(bus));
         }
     }
 }

@@ -4,15 +4,21 @@
 #include <string_view>
 #include <optional>
 
+
 namespace transport_catalogue {
 
-void TransportCatalogue::AddStop(Stop& stop) {
+bool CompareBusesByName::operator()(const Bus* lhs, const Bus* rhs) const {
+        return lhs->name < rhs->name;
+    }
+
+void TransportCatalogue::AddStop(Stop&& stop) {
     stops_.push_back(std::move(stop));
     stops_name_to_stop_[stops_.back().name] = &stops_.back();
 }
 
-void TransportCatalogue::AddBus(Bus& bus) {
+void TransportCatalogue::AddBus(Bus&& bus) {
     buses_.push_back(std::move(bus));
+    bus_name_to_bus_[buses_.back().name] = &buses_.back();
     for (const auto& stop : buses_.back().stops) {
         bus_by_stop_[stop->name].insert(&buses_.back());
     }
@@ -27,12 +33,11 @@ const Stop* TransportCatalogue::GetStop(std::string_view stop_name) const {
 }
 
 const Bus* TransportCatalogue::GetBus(std::string_view bus_name) const {
-    for (const auto& bus : buses_) {
-        if (bus_name == bus.name) {
-            return &bus; 
-        }
+    auto it = bus_name_to_bus_.find(bus_name);
+    if (it != bus_name_to_bus_.end()) {
+        return it->second; // Возвращаем адрес объекта
     }
-    return nullptr; // Если автобус с таким именем не найден
+    return nullptr; // // Если автобус с таким именем не найден
 }
 
 BusStat TransportCatalogue::GetBusStat(const Bus& bus) const {
@@ -53,7 +58,7 @@ BusStat TransportCatalogue::GetBusStat(const Bus& bus) const {
     return stat;
 }
 
-const std::set<Bus*, CompareBusesByName> TransportCatalogue::GetBusesByStop(std::string_view stop_name) const {
+const std::set<const Bus*, CompareBusesByName> TransportCatalogue::GetBusesByStop(std::string_view stop_name) const {
     auto it = bus_by_stop_.find(stop_name);
     if (it != bus_by_stop_.end()) {
         return it->second;
