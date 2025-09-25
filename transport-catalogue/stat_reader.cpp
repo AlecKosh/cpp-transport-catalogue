@@ -18,7 +18,7 @@ void ParseAndPrintStat(const TransportCatalogue& tansport_catalogue, std::string
         if (bus) {
             BusStat stat = tansport_catalogue.GetBusStat(*bus);
             output << "Bus " << bus_name << ": " << stat.total_stops << " stops on route, " << stat.unique_stops << " unique stops, " 
-            << stat.route_length << " route length" << std::endl;
+            << stat.route_length << " route length, " << stat.curvature << " curvature" << std::endl;
         } else {
             output << command_name << " " << bus_name << ": not found" << std::endl;
         }
